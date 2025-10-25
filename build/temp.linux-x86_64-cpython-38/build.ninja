@@ -1,0 +1,24 @@
+ninja_required_version = 1.3
+cxx = c++
+
+cflags = -pthread -B /home/one/miniconda3/envs/xdy/compiler_compat -Wl,--sysroot=/ -Wsign-compare -DNDEBUG -g -fwrapv -O3 -Wall -Wstrict-prototypes -fPIC -Ilegged_gym/MPC_Controller/convex_MPC/ -I/home/one/miniconda3/envs/xdy/lib/python3.8/site-packages/torch/include -I/home/one/miniconda3/envs/xdy/lib/python3.8/site-packages/torch/include/torch/csrc/api/include -I/home/one/miniconda3/envs/xdy/lib/python3.8/site-packages/torch/include/TH -I/home/one/miniconda3/envs/xdy/lib/python3.8/site-packages/torch/include/THC -I/home/one/miniconda3/envs/xdy/include/python3.8 -c
+post_cflags = -O3 -g -fopenmp -DTORCH_API_INCLUDE_EXTENSION_H '-DPYBIND11_COMPILER_TYPE="_gcc"' '-DPYBIND11_STDLIB="_libstdcpp"' '-DPYBIND11_BUILD_ABI="_cxxabi1011"' -DTORCH_EXTENSION_NAME=mpc_osqp -D_GLIBCXX_USE_CXX11_ABI=0 -std=c++17
+cuda_dlink_post_cflags = 
+ldflags = 
+
+rule compile
+  command = $cxx -MMD -MF $out.d $cflags -c $in -o $out $post_cflags
+  depfile = $out.d
+  deps = gcc
+
+
+
+
+
+build /home/one/isaac/legged_gym-master/build/temp.linux-x86_64-cpython-38/legged_gym/MPC_Controller/convex_MPC/mpc_osqp.o: compile /home/one/isaac/legged_gym-master/legged_gym/MPC_Controller/convex_MPC/mpc_osqp.cc
+
+
+
+
+
+

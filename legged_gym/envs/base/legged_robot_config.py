@@ -32,7 +32,7 @@ from .base_config import BaseConfig
 
 class LeggedRobotCfg(BaseConfig):
     class env:
-        num_envs = 2048   # 原4096 智能体数量
+        num_envs = 32   # 原4096 智能体数量 2048
         num_observations = 45 # 观测数量
         num_privileged_obs = None # if not None a priviledge_obs_buf will be returned by step() (critic obs for assymetric training). None is returned otherwise 
         num_actions = 12 # 模型输出，12自由度

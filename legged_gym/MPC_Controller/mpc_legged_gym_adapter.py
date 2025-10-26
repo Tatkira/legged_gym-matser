@@ -7,7 +7,7 @@ MPC控制器与legged_gym的适配接口
 
 import numpy as np
 from typing import Dict, List, Tuple, Optional
-from lightweight_mpc import LightweightMPC, MPCConfig, RobotState
+from .lightweight_mpc import LightweightMPC, MPCConfig, RobotState
 
 
 class MPCLeggedGymAdapter:
@@ -310,7 +310,7 @@ class MPCLeggedGymAdapter:
 
 def create_a1_mpc_adapter(num_envs: int = 1) -> MPCLeggedGymAdapter:
     """
-    创建针对Unitree A1机器人的MPC适配器
+    创建针对Unitree A1机器人的MPC适配器（使用真实参数）
     
     Args:
         num_envs: 并行环境数量
@@ -318,22 +318,9 @@ def create_a1_mpc_adapter(num_envs: int = 1) -> MPCLeggedGymAdapter:
     Returns:
         MPC适配器实例
     """
-    # A1机器人参数
-    config = MPCConfig(
-        dt=0.025,        # 25ms控制周期
-        horizon=10,       # 250ms预测时域
-        mu=0.7,          # 摩擦系数
-        f_max=120.0,     # 最大足端力
-        alpha=1e-5,      # 正则化参数
-        x_drag=0.1       # x方向阻力
-    )
+    from .a1_robot_parameters import create_a1_mpc_adapter_with_real_params
     
-    robot_params = {
-        'mass': 12.0,  # A1质量约12kg
-        'inertia': np.diag([0.017, 0.067, 0.072])  # A1惯性矩阵
-    }
-    
-    return MPCLeggedGymAdapter(config, robot_params, num_envs)
+    return create_a1_mpc_adapter_with_real_params(num_envs)
 
 
 def create_anymal_mpc_adapter(num_envs: int = 1) -> MPCLeggedGymAdapter:

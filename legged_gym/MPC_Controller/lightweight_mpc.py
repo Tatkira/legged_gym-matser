@@ -17,9 +17,9 @@ class MPCConfig:
     """MPC配置参数 - 对应Cheetah-Software的problem_setup结构"""
     dt: float = 0.025          # 时间步长 (s)
     horizon: int = 10          # 预测时域长度
-    mu: float = 0.7            # 摩擦系数
-    f_max: float = 120.0       # 最大足端力 (N)
-    alpha: float = 1e-5        # 正则化参数
+    mu: float = 0.8            # 摩擦系数 (使用较高值，让RL处理摩擦变化)
+    f_max: float = 100.0       # 最大足端力 (根据机械工程师建议)
+    alpha: float = 1e-4        # 正则化参数
     x_drag: float = 0.1        # x方向阻力系数
 
 
@@ -344,14 +344,29 @@ class LightweightMPC:
             P_sparse = sp.csc_matrix(self.P)
             A_sparse = sp.csc_matrix(self.A_constraint)
             
-            # 设置问题数据
+            # 设置问题数据 - 调整参数以提高求解成功率
             m.setup(P=P_sparse, q=self.q, A=A_sparse, l=self.lb, u=self.ub, 
-                   verbose=False, polish=True, max_iter=1000)
+                   verbose=False, polish=True, max_iter=4000, eps_abs=1e-6, eps_rel=1e-6,
+                   eps_prim_inf=1e-6, eps_dual_inf=1e-6, alpha=1.6)
             
             # 求解
             results = m.solve()
             
-            if results.info.status != 'solved':
+            # 检查求解状态
+            if results.info.status == 'solved':
+                # 理想情况：精确求解
+                return results.x.reshape(self.config.horizon, 4, 3)
+            elif results.info.status == 'solved inaccurate':
+                # 可接受：近似求解，但仍可使用
+                return results.x.reshape(self.config.horizon, 4, 3)
+            elif results.info.status == 'max iter reached':
+                # 达到最大迭代次数，但仍可能有可用解
+                if hasattr(results, 'x') and results.x is not None:
+                    return results.x.reshape(self.config.horizon, 4, 3)
+                else:
+                    print(f"OSQP求解失败: {results.info.status}")
+                    return None
+            else:
                 print(f"OSQP求解失败: {results.info.status}")
                 return None
             

@@ -84,7 +84,18 @@ class TaskRegistry():
         if name in self.task_classes:
             task_class = self.get_task_class(name)
         else:
-            raise ValueError(f"Task with name: {name} was not registered")
+            # 尝试注册MPC环境
+            try:
+                from legged_gym.envs import register_mpc_environments
+                register_mpc_environments()
+                
+                # 再次检查
+                if name in self.task_classes:
+                    task_class = self.get_task_class(name)
+                else:
+                    raise ValueError(f"Task with name: {name} was not registered")
+            except ImportError:
+                raise ValueError(f"Task with name: {name} was not registered")
         if env_cfg is None:
             # load config files
             env_cfg, _ = self.get_cfgs(name)

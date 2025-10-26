@@ -48,4 +48,13 @@ task_registry.register( "anymal_c_rough", Anymal, AnymalCRoughCfg(), AnymalCRoug
 task_registry.register( "anymal_c_flat", Anymal, AnymalCFlatCfg(), AnymalCFlatCfgPPO() )
 task_registry.register( "anymal_b", Anymal, AnymalBRoughCfg(), AnymalBRoughCfgPPO() )
 task_registry.register( "a1", LeggedRobot, A1RoughCfg(), A1RoughCfgPPO() )
+
+# MPC增强环境将在需要时动态注册
+def register_mpc_environments():
+    """动态注册MPC环境"""
+    from .a1.a1_mpc import A1MPCRobot, A1MPCRoughCfg, A1MPCRoughCfgPPO
+    from legged_gym.utils.task_registry import task_registry
+    
+    if "a1mpc" not in task_registry.task_classes:
+        task_registry.register("a1mpc", A1MPCRobot, A1MPCRoughCfg(), A1MPCRoughCfgPPO())
 task_registry.register( "cassie", Cassie, CassieRoughCfg(), CassieRoughCfgPPO() )
